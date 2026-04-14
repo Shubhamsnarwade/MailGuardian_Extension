@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Login — MailGuardian</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#060910;--bg2:#0d1117;--bg3:#111827;--accent:#00e5a0;--accent2:#0ea5e9;--accent3:#f59e0b;--danger:#ef4444;--text:#f0f4f8;--muted:#8896a7;--border:rgba(255,255,255,0.07);--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;position:relative;overflow:hidden;}
+.glow1{position:fixed;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(245,158,11,0.07) 0%,transparent 70%);top:0;left:50%;transform:translateX(-50%);pointer-events:none;}
+.glow2{position:fixed;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,160,0.05) 0%,transparent 70%);bottom:0;right:0;pointer-events:none;}
+.back-btn{position:fixed;top:1.5rem;left:1.5rem;display:flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color 0.2s;z-index:10;}
+.back-btn:hover{color:var(--text);}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:2.5rem 2rem;width:100%;max-width:420px;position:relative;z-index:1;animation:slideUp 0.5s ease both;}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+.card-logo{display:flex;align-items:center;gap:10px;margin-bottom:0.5rem;justify-content:center;}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent3),var(--accent));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.logo-text{font-family:var(--font-head);font-size:1.3rem;font-weight:800;}
+.logo-text span{color:var(--accent);}
+.admin-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);color:var(--accent3);padding:3px 10px;border-radius:100px;font-size:0.72rem;font-weight:500;margin:0.5rem auto 1.5rem;display:block;width:fit-content;}
+.card-title{font-family:var(--font-head);font-size:1.5rem;font-weight:700;text-align:center;margin-bottom:0.4rem;}
+.card-sub{color:var(--muted);font-size:0.83rem;text-align:center;margin-bottom:2rem;line-height:1.6;}
+.field{margin-bottom:1rem;}
+.flabel{font-size:0.75rem;color:var(--muted);font-weight:500;letter-spacing:0.3px;margin-bottom:5px;text-transform:uppercase;}
+.finput{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:0.75rem 1rem;color:var(--text);font-family:var(--font-body);font-size:0.92rem;outline:none;transition:border-color 0.2s;}
+.finput:focus{border-color:rgba(245,158,11,0.4);}
+.finput::placeholder{color:var(--muted);}
+.btn{width:100%;background:linear-gradient(135deg,var(--accent3),var(--accent));color:#060910;border:none;border-radius:9px;padding:0.82rem;font-family:var(--font-body);font-size:0.95rem;font-weight:500;cursor:pointer;transition:all 0.2s;margin-top:0.3rem;}
+.btn:hover{box-shadow:0 6px 20px rgba(245,158,11,0.3);}
+.btn:disabled{opacity:0.6;cursor:not-allowed;}
+.msg{display:none;padding:0.75rem 1rem;border-radius:8px;font-size:0.82rem;margin-top:0.8rem;text-align:center;}
+.msg.error{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--danger);}
+.msg.loading{background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);color:var(--accent2);}
+.security-note{display:flex;align-items:center;gap:6px;margin-top:1.2rem;padding:0.7rem 1rem;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;font-size:0.75rem;color:var(--muted);}
+.user-link{text-align:center;margin-top:1rem;font-size:0.8rem;color:var(--muted);}
+.user-link a{color:var(--accent2);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="glow1"></div>
+<div class="glow2"></div>
+<a href="index.html" class="back-btn">← Back to Home</a>
+
+<div class="card">
+  <div class="card-logo">
+    <div class="logo-icon">🔐</div>
+    <div class="logo-text">Mail<span>Guardian</span></div>
+  </div>
+  <div class="admin-badge">🛡️ Admin Portal</div>
+  <div class="card-title">Admin Access</div>
+  <p class="card-sub">This portal is restricted to authorized administrators only.</p>
+
+  <div class="field">
+    <div class="flabel">Admin Email</div>
+    <input class="finput" type="email" id="adminEmail" placeholder="admin@mailguardian.com"/>
+  </div>
+  <div class="field">
+    <div class="flabel">Password</div>
+    <input class="finput" type="password" id="adminPass" placeholder="Enter your password"/>
+  </div>
+  <button class="btn" id="loginBtn">Sign In to Admin Portal →</button>
+  <div class="msg" id="loginMsg"></div>
+
+  <div class="security-note">
+    🔒 This is a secure admin area. Unauthorized access is prohibited.
+  </div>
+  <div class="user-link">Not an admin? <a href="index.html">Go back to website</a></div>
+</div>
+
+<script>
+const SERVER="http://localhost:5000";
+
+document.getElementById("loginBtn").addEventListener("click", adminLogin);
+["adminEmail","adminPass"].forEach(id=>{
+  document.getElementById(id).addEventListener("keydown",e=>{if(e.key==="Enter")adminLogin();});
+});
+
+async function adminLogin(){
+  const email=document.getElementById("adminEmail").value.trim();
+  const pass=document.getElementById("adminPass").value;
+  const btn=document.getElementById("loginBtn");
+  if(!email||!email.includes("@")){showMsg("error","Please enter your admin email.");return;}
+  if(!pass){showMsg("error","Please enter your password.");return;}
+  btn.disabled=true;btn.textContent="Signing in...";
+  showMsg("loading","⏳ Verifying credentials...");
+  try{
+    const res=await fetch(SERVER+"/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password:pass})});
+    const data=await res.json();
+    if(data.success){
+      localStorage.setItem("mg_admin_token",data.token);
+      localStorage.setItem("mg_admin",JSON.stringify(data.admin));
+      showMsg("loading","✅ Access granted! Loading portal...");
+      setTimeout(()=>window.location.href="admin.html",800);
+    } else {
+      showMsg("error",data.error||"Invalid credentials. Access denied.");
+      btn.disabled=false;btn.textContent="Sign In to Admin Portal →";
+    }
+  }catch(e){
+    showMsg("error","Cannot connect to server. Make sure MailGuardian server is running.");
+    btn.disabled=false;btn.textContent="Sign In to Admin Portal →";
+  }
+}
+
+function showMsg(type,text){const el=document.getElementById("loginMsg");el.className="msg "+type;el.textContent=text;el.style.display="block";}
+</script>
+</body>
+</html>

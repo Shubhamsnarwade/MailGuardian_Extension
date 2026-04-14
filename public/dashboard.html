@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dashboard — MailGuardian</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#060910;--bg2:#0d1117;--bg3:#111827;--accent:#00e5a0;--accent2:#0ea5e9;--accent3:#f59e0b;--danger:#ef4444;--text:#f0f4f8;--muted:#8896a7;--border:rgba(255,255,255,0.07);--card:rgba(255,255,255,0.04);--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 5%;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
+.logo{font-family:var(--font-head);font-size:1.2rem;font-weight:800;display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text);}
+.logo-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.logo span{color:var(--accent);}
+.nav-right{display:flex;align-items:center;gap:1rem;}
+.user-chip{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);padding:0.4rem 0.8rem;border-radius:100px;font-size:0.8rem;color:var(--muted);}
+.user-avatar{width:24px;height:24px;border-radius:50%;background:rgba(0,229,160,0.15);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);font-family:var(--font-head);}
+.logout-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:0.4rem 0.9rem;border-radius:7px;font-family:var(--font-body);font-size:0.78rem;cursor:pointer;transition:all 0.2s;}
+.logout-btn:hover{border-color:rgba(239,68,68,0.4);color:var(--danger);}
+.main{max-width:1100px;margin:0 auto;padding:2rem 5%;}
+
+/* PAUSED BANNER */
+.paused-banner{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:14px;padding:1.2rem 1.5rem;margin-bottom:1.5rem;display:none;}
+.paused-banner h3{color:var(--danger);font-family:var(--font-head);font-size:1rem;font-weight:700;margin-bottom:0.4rem;display:flex;align-items:center;gap:8px;}
+.paused-banner p{font-size:0.85rem;color:var(--muted);line-height:1.6;}
+.paused-banner a{color:var(--accent2);text-decoration:none;}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:1.5rem;}
+.metric{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem;text-align:center;animation:fadeUp 0.5s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.metric-label{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+.metric-val{font-family:var(--font-head);font-size:1.6rem;font-weight:800;}
+.metric-val.green{color:var(--accent);}
+.metric-val.amber{color:var(--accent3);}
+.metric-val.red{color:var(--danger);}
+.metric-val.blue{color:var(--accent2);}
+
+/* STATUS */
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;font-size:0.72rem;font-weight:500;}
+.status-pill.active{background:rgba(0,229,160,0.1);color:var(--accent);border:1px solid rgba(0,229,160,0.2);}
+.status-pill.stopped{background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.2);}
+.sdot{width:6px;height:6px;border-radius:50%;}
+.sdot.active{background:var(--accent);animation:sp 1.5s infinite;}
+.sdot.stopped{background:var(--danger);}
+@keyframes sp{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+/* CHART */
+.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.4rem;margin-bottom:1.5rem;animation:fadeUp 0.5s 0.1s ease both;}
+.card-title{font-family:var(--font-head);font-size:0.95rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;}
+.card-tag{font-size:0.72rem;color:var(--muted);font-weight:400;}
+.chart-wrap{position:relative;height:220px;}
+
+/* HISTORY */
+.history-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.4rem;animation:fadeUp 0.5s 0.2s ease both;}
+.history-list{display:flex;flex-direction:column;gap:8px;margin-top:1rem;max-height:320px;overflow-y:auto;}
+.history-item{display:flex;align-items:center;justify-content:space-between;padding:0.7rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:10px;transition:border-color 0.2s;}
+.history-item:hover{border-color:rgba(255,255,255,0.12);}
+.h-left{display:flex;flex-direction:column;gap:2px;}
+.h-date{font-size:0.8rem;font-weight:500;}
+.h-platform{font-size:0.72rem;color:var(--muted);text-transform:capitalize;}
+.h-right{display:flex;align-items:center;gap:8px;}
+.score-chip{padding:3px 10px;border-radius:100px;font-size:0.75rem;font-weight:600;}
+.score-chip.good{background:rgba(0,229,160,0.1);color:var(--accent);}
+.score-chip.fair{background:rgba(245,158,11,0.1);color:var(--accent3);}
+.score-chip.poor{background:rgba(239,68,68,0.1);color:var(--danger);}
+.tier-tag{font-size:0.7rem;color:var(--muted);}
+.empty{text-align:center;padding:2rem;color:var(--muted);font-size:0.85rem;}
+
+/* LOADING */
+#loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:1rem;}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html"><div class="logo-icon">🛡️</div>Mail<span>Guardian</span></a>
+  <div class="nav-right">
+    <div class="user-chip">
+      <div class="user-avatar" id="userAvatar">MG</div>
+      <span id="userName">Loading...</span>
+    </div>
+    <button class="logout-btn" id="logoutBtn">Log out</button>
+  </div>
+</nav>
+
+<div class="main">
+
+  <!-- LOADING -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <p style="color:var(--muted);font-size:0.85rem;">Loading your dashboard...</p>
+  </div>
+
+  <!-- CONTENT (hidden until loaded) -->
+  <div id="content" style="display:none;">
+
+    <!-- PAUSED BANNER -->
+    <div class="paused-banner" id="pausedBanner">
+      <h3>⛔ Your account has been paused</h3>
+      <p id="pausedReason">Your account is currently paused. Contact <a href="mailto:mailguardiansupport@gmail.com">mailguardiansupport@gmail.com</a> to reactivate.</p>
+    </div>
+
+    <!-- METRICS -->
+    <div class="metrics" id="metricsRow"></div>
+
+    <!-- SCORE GRAPH -->
+    <div class="chart-card">
+      <div class="card-title">
+        Sentiment Score History
+        <span class="card-tag" id="chartTag">Last 20 emails</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="scoreChart"></canvas>
+      </div>
+    </div>
+
+    <!-- HISTORY LIST -->
+    <div class="history-card">
+      <div class="card-title">Recent Activity</div>
+      <div class="history-list" id="historyList"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const SERVER="http://localhost:5000";
+const token=localStorage.getItem("mg_token");
+const userStr=localStorage.getItem("mg_user");
+
+if(!token){window.location.href="login.html";}
+
+let chartInstance=null;
+
+document.getElementById("logoutBtn").addEventListener("click",()=>{
+  localStorage.removeItem("mg_token");
+  localStorage.removeItem("mg_user");
+  window.location.href="login.html";
+});
+
+async function loadDashboard(){
+  try{
+    const res=await fetch(SERVER+"/api/user/dashboard",{headers:{"Authorization":"Bearer "+token}});
+    const data=await res.json();
+    if(!data.success){localStorage.removeItem("mg_token");window.location.href="login.html";return;}
+    renderDashboard(data.user,data.scores);
+  }catch(e){
+    document.getElementById("loading").innerHTML='<p style="color:#ef4444;">Cannot connect to server. Make sure MailGuardian server is running.</p>';
+  }
+}
+
+function renderDashboard(user,scores){
+  document.getElementById("loading").style.display="none";
+  document.getElementById("content").style.display="block";
+
+  // User info
+  const initials=(user.name||"MG").split(" ").map(n=>n[0]).join("").toUpperCase().slice(0,2);
+  document.getElementById("userAvatar").textContent=initials;
+  document.getElementById("userName").textContent=user.name||user.email;
+
+  // Paused banner
+  if(user.status==="stopped"){
+    const banner=document.getElementById("pausedBanner");
+    banner.style.display="block";
+    // Try to get pause reason from server
+    fetch(SERVER+"/api/verify-user",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:user.email})})
+    .then(r=>r.json()).then(d=>{
+      if(d.reason) document.getElementById("pausedReason").textContent=d.reason;
+    });
+  }
+
+  // Metrics
+  const total=scores.length;
+  const avg=total>0?Math.round(scores.reduce((a,b)=>a+b.score,0)/total):0;
+  const last=total>0?scores[0].score:null;
+  const good=scores.filter(s=>s.score>=80).length;
+  const poor=scores.filter(s=>s.score<=40).length;
+  const statusClass=user.status==="active"?"active":"stopped";
+  const statusLabel=user.status==="active"?"Active":"Paused";
+
+  document.getElementById("metricsRow").innerHTML=`
+    <div class="metric" style="animation-delay:0s">
+      <div class="metric-label">Status</div>
+      <div style="margin-top:4px;">
+        <span class="status-pill ${statusClass}"><span class="sdot ${statusClass}"></span>${statusLabel}</span>
+      </div>
+    </div>
+    <div class="metric" style="animation-delay:0.05s">
+      <div class="metric-label">Total Analyzed</div>
+      <div class="metric-val blue">${total}</div>
+    </div>
+    <div class="metric" style="animation-delay:0.1s">
+      <div class="metric-label">Avg Score</div>
+      <div class="metric-val ${avg>=80?"green":avg>=50?"amber":"red"}">${avg||"—"}</div>
+    </div>
+    <div class="metric" style="animation-delay:0.15s">
+      <div class="metric-label">Last Score</div>
+      <div class="metric-val ${last>=80?"green":last>=50?"amber":"red"}">${last!==null?last:"—"}</div>
+    </div>
+    <div class="metric" style="animation-delay:0.2s">
+      <div class="metric-label">Great Emails</div>
+      <div class="metric-val green">${good}</div>
+    </div>
+    <div class="metric" style="animation-delay:0.25s">
+      <div class="metric-label">Poor Emails</div>
+      <div class="metric-val red">${poor}</div>
+    </div>
+  `;
+
+  // Chart
+  const last20=scores.slice(0,20).reverse();
+  document.getElementById("chartTag").textContent="Last "+last20.length+" emails";
+  if(chartInstance) chartInstance.destroy();
+  const ctx=document.getElementById("scoreChart").getContext("2d");
+  chartInstance=new Chart(ctx,{
+    type:"line",
+    data:{
+      labels:last20.map((_,i)=>"#"+(i+1)),
+      datasets:[{
+        label:"Sentiment Score",
+        data:last20.map(s=>s.score),
+        borderColor:"#00e5a0",
+        backgroundColor:"rgba(0,229,160,0.08)",
+        borderWidth:2,
+        pointBackgroundColor:last20.map(s=>s.score>=80?"#00e5a0":s.score>=50?"#f59e0b":"#ef4444"),
+        pointRadius:5,
+        pointHoverRadius:7,
+        fill:true,
+        tension:0.4
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:"#0d1117",
+          borderColor:"rgba(255,255,255,0.07)",
+          borderWidth:1,
+          titleColor:"#f0f4f8",
+          bodyColor:"#8896a7",
+          callbacks:{label:ctx=>"Score: "+ctx.raw}
+        }
+      },
+      scales:{
+        y:{min:0,max:100,grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8896a7",stepSize:20}},
+        x:{grid:{color:"rgba(255,255,255,0.04)"},ticks:{color:"#8896a7"}}
+      }
+    }
+  });
+
+  // History list
+  const list=document.getElementById("historyList");
+  if(!scores.length){list.innerHTML='<div class="empty">No emails analyzed yet.<br/>Start composing to see results here.</div>';return;}
+  list.innerHTML=scores.slice(0,20).map(s=>{
+    const cls=s.score>=80?"good":s.score>=50?"fair":"poor";
+    const tier=s.score>=80?"Great":s.score>=50?"Fair":"Poor";
+    const d=new Date(s.analyzedAt);
+    const dateStr=d.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})+" · "+d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+    return `<div class="history-item">
+      <div class="h-left">
+        <div class="h-date">${dateStr}</div>
+        <div class="h-platform">${s.platform||"gmail"}</div>
+      </div>
+      <div class="h-right">
+        <span class="tier-tag">${tier}</span>
+        <span class="score-chip ${cls}">${s.score}</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+loadDashboard();
+</script>
+</body>
+</html>

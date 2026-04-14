@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MailGuardian</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --green:#00b87a;--green-light:rgba(0,184,122,0.1);
+    --red:#ef4444;--amber:#f59e0b;
+    --text:#0f172a;--muted:#64748b;--subtle:#94a3b8;
+    --border:#e2e8f0;--bg:#f8fafc;
+    --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
+  }
+  body{width:320px;min-height:200px;background:#fff;font-family:var(--font-body);color:var(--text);font-size:14px;}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* SETUP */
+  #view-setup{padding:1.4rem;}
+  .popup-header{display:flex;align-items:center;gap:9px;margin-bottom:1.4rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+  .popup-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--green),#0ea5e9);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+  .popup-logo-text{font-family:var(--font-head);font-size:1rem;font-weight:800;color:var(--text);}
+  .popup-logo-text span{color:var(--green);}
+  .setup-desc{font-size:0.82rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.5;}
+  .field-label{font-size:0.72rem;color:var(--muted);font-weight:500;letter-spacing:0.3px;margin-bottom:5px;text-transform:uppercase;}
+  .field{margin-bottom:1rem;}
+  .field input{width:100%;border:1px solid var(--border);border-radius:8px;padding:0.6rem 0.8rem;color:var(--text);font-family:var(--font-body);font-size:0.85rem;outline:none;transition:border-color 0.2s;background:#fff;}
+  .field input:focus{border-color:rgba(0,184,122,0.5);}
+  .field input::placeholder{color:var(--subtle);}
+  .save-btn{width:100%;background:var(--green);color:#fff;border:none;border-radius:9px;padding:0.65rem;font-family:var(--font-body);font-size:0.9rem;font-weight:500;cursor:pointer;transition:background 0.2s;margin-top:0.2rem;}
+  .save-btn:hover{background:#00a36c;}
+  .msg{display:none;font-size:0.78rem;margin-top:0.6rem;text-align:center;padding:0.5rem;border-radius:7px;}
+  .msg.success{background:var(--green-light);color:#00875a;}
+  .msg.error{background:rgba(239,68,68,0.08);color:var(--red);}
+
+  /* MAIN */
+  #view-main{padding:1.2rem;}
+  .main-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.9rem;border-bottom:1px solid var(--border);}
+  .toggle-wrap{display:flex;align-items:center;gap:8px;}
+  .toggle-label{font-size:0.78rem;color:var(--muted);}
+  .toggle{position:relative;width:38px;height:21px;flex-shrink:0;}
+  .toggle input{opacity:0;width:0;height:0;}
+  .toggle-slider{position:absolute;inset:0;background:#e2e8f0;border-radius:100px;cursor:pointer;transition:background 0.25s;}
+  .toggle-slider::before{content:'';position:absolute;width:15px;height:15px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform 0.25s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+  .toggle input:checked + .toggle-slider{background:var(--green);}
+  .toggle input:checked + .toggle-slider::before{transform:translateX(17px);}
+
+  .user-info{display:flex;align-items:center;gap:8px;margin-bottom:1rem;padding:0.7rem;background:var(--bg);border-radius:10px;border:1px solid var(--border);}
+  .user-avatar{width:30px;height:30px;border-radius:50%;background:var(--green-light);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green);font-family:var(--font-head);flex-shrink:0;}
+  .user-email{font-size:0.78rem;color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
+  .status-dot.off{background:#e2e8f0;}
+
+  .stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1rem;}
+  .stat-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:0.65rem 0.5rem;text-align:center;}
+  .stat-num{font-family:var(--font-head);font-size:1.2rem;font-weight:800;color:var(--text);}
+  .stat-num.green{color:var(--green);}
+  .stat-num.amber{color:var(--amber);}
+  .stat-num.red{color:var(--red);}
+  .stat-label{font-size:0.67rem;color:var(--subtle);margin-top:2px;}
+
+  .section-title{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;font-weight:500;margin-bottom:0.6rem;}
+  .history-list{display:flex;flex-direction:column;gap:5px;max-height:140px;overflow-y:auto;}
+  .history-item{display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.7rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;}
+  .h-date{font-size:0.73rem;color:var(--subtle);}
+  .h-platform{font-size:0.7rem;color:var(--muted);text-transform:capitalize;}
+  .h-score{font-size:0.75rem;font-weight:600;padding:2px 8px;border-radius:100px;}
+  .h-score.good{background:rgba(0,184,122,0.1);color:#00875a;}
+  .h-score.fair{background:rgba(245,158,11,0.1);color:#b45309;}
+  .h-score.poor{background:rgba(239,68,68,0.1);color:var(--red);}
+  .empty-history{font-size:0.8rem;color:var(--subtle);text-align:center;padding:1rem 0;}
+
+  .popup-footer{display:flex;align-items:center;justify-content:space-between;margin-top:1rem;padding-top:0.8rem;border-top:1px solid var(--border);}
+  .settings-link{font-size:0.75rem;color:var(--subtle);cursor:pointer;background:none;border:none;font-family:var(--font-body);padding:0;transition:color 0.2s;}
+  .settings-link:hover{color:var(--muted);}
+  .version-tag{font-size:0.7rem;color:var(--subtle);}
+</style>
+</head>
+<body>
+
+<!-- SETUP VIEW -->
+<div class="view active" id="view-setup">
+  <div class="popup-header">
+    <div class="popup-logo-icon">🛡️</div>
+    <div class="popup-logo-text">Mail<span>Guardian</span></div>
+  </div>
+  <p class="setup-desc">Enter your registered email to activate MailGuardian. No API key needed!</p>
+  <div class="field">
+    <div class="field-label">Your Registered Email</div>
+    <input type="email" id="userEmail" placeholder="you@gmail.com"/>
+  </div>
+  <button class="save-btn" id="saveBtn">Activate MailGuardian →</button>
+  <div class="msg" id="setupMsg"></div>
+</div>
+
+<!-- MAIN VIEW -->
+<div class="view" id="view-main">
+  <div class="main-header">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="popup-logo-icon" style="width:26px;height:26px;font-size:13px;">🛡️</div>
+      <div class="popup-logo-text" style="font-size:0.9rem;">Mail<span>Guardian</span></div>
+    </div>
+    <div class="toggle-wrap">
+      <span class="toggle-label" id="toggleLabel">Active</span>
+      <label class="toggle">
+        <input type="checkbox" id="activeToggle" checked/>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="user-info">
+    <div class="user-avatar" id="userAvatarEl">—</div>
+    <div class="user-email" id="userEmailEl">—</div>
+    <div class="status-dot" id="statusDot"></div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num green" id="statTotal">0</div><div class="stat-label">Analyzed</div></div>
+    <div class="stat-card"><div class="stat-num amber" id="statAvg">—</div><div class="stat-label">Avg Score</div></div>
+    <div class="stat-card"><div class="stat-num" id="statLast">—</div><div class="stat-label">Last Score</div></div>
+  </div>
+
+  <div class="section-title">Recent Activity</div>
+  <div class="history-list" id="historyList"></div>
+
+  <div class="popup-footer">
+    <button class="settings-link" id="settingsLink">⚙ Change Email</button>
+    <span class="version-tag">v1.0.0</span>
+  </div>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>

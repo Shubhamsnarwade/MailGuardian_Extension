@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MailGuardian — AI Email Sentiment Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#060910;--bg2:#0d1117;--bg3:#111827;--accent:#00e5a0;--accent2:#0ea5e9;--accent3:#f59e0b;--text:#f0f4f8;--muted:#8896a7;--border:rgba(255,255,255,0.07);--card:rgba(255,255,255,0.04);--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.7;overflow-x:hidden;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.2rem 5%;background:rgba(6,9,16,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.logo{font-family:var(--font-head);font-size:1.4rem;font-weight:800;display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.logo span{color:var(--accent);}
+nav ul{list-style:none;display:flex;gap:1.5rem;align-items:center;}
+nav ul a{color:var(--muted);text-decoration:none;font-size:0.9rem;transition:color 0.2s;}
+nav ul a:hover{color:var(--text);}
+.nav-login{border:1px solid var(--border)!important;padding:0.45rem 1rem;border-radius:6px;color:var(--text)!important;}
+.nav-cta{background:var(--accent)!important;color:#060910!important;padding:0.45rem 1rem;border-radius:6px;font-weight:500!important;}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8rem 5% 4rem;position:relative;overflow:hidden;}
+.glow1{position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,160,0.08) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-60%);pointer-events:none;animation:gp 4s ease-in-out infinite;}
+.glow2{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(14,165,233,0.06) 0%,transparent 70%);bottom:10%;right:10%;pointer-events:none;animation:gp 4s 2s ease-in-out infinite;}
+@keyframes gp{0%,100%{opacity:1;}50%{opacity:0.5;}}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.25);color:var(--accent);padding:0.35rem 1rem;border-radius:100px;font-size:0.8rem;font-weight:500;margin-bottom:1.8rem;animation:fd 0.6s ease both;}
+.bdot{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:bp 1.5s infinite;}
+@keyframes bp{0%,100%{opacity:1;}50%{opacity:0.3;}}
+h1{font-family:var(--font-head);font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:1.5rem;animation:fd 0.6s 0.1s ease both;}
+.hl{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hsub{font-size:1.1rem;color:var(--muted);max-width:520px;margin-bottom:2.5rem;animation:fd 0.6s 0.2s ease both;}
+.hbtns{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-bottom:3rem;animation:fd 0.6s 0.3s ease both;}
+.bp{background:var(--accent);color:#060910;padding:0.85rem 2rem;border-radius:8px;font-family:var(--font-body);font-size:0.95rem;font-weight:500;border:none;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-block;}
+.bp:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,229,160,0.3);}
+.bs{background:transparent;color:var(--text);padding:0.85rem 2rem;border-radius:8px;font-family:var(--font-body);font-size:0.95rem;border:1px solid var(--border);cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-block;}
+.bs:hover{background:var(--card);}
+.stats{display:flex;gap:3rem;flex-wrap:wrap;justify-content:center;animation:fd 0.6s 0.4s ease both;}
+.snum{font-family:var(--font-head);font-size:1.8rem;font-weight:700;}
+.snum span{color:var(--accent);}
+.slbl{font-size:0.8rem;color:var(--muted);margin-top:2px;}
+.sec{padding:5rem 5%;max-width:1100px;margin:0 auto;}
+.stag{font-size:0.78rem;font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:0.8rem;}
+.stitle{font-family:var(--font-head);font-size:clamp(1.8rem,3vw,2.5rem);font-weight:700;letter-spacing:-1px;margin-bottom:1rem;}
+.ssub{color:var(--muted);font-size:0.95rem;margin-bottom:2.5rem;max-width:500px;}
+.tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;}
+.tc{border-radius:14px;padding:1.4rem;border:1px solid;transition:transform 0.3s;}
+.tc:hover{transform:translateY(-4px);}
+.tc.poor{background:rgba(239,68,68,0.05);border-color:rgba(239,68,68,0.2);}
+.tc.fair{background:rgba(245,158,11,0.05);border-color:rgba(245,158,11,0.2);}
+.tc.great{background:rgba(0,229,160,0.05);border-color:rgba(0,229,160,0.2);}
+.tr{font-family:var(--font-head);font-size:1.1rem;font-weight:700;margin:0.5rem 0 0.3rem;}
+.tr.poor{color:#ef4444;}.tr.fair{color:var(--accent3);}.tr.great{color:var(--accent);}
+.td{font-size:0.83rem;color:var(--muted);line-height:1.6;}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.2rem;}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;transition:all 0.3s;position:relative;overflow:hidden;}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity 0.3s;}
+.sc:nth-child(1)::before{background:var(--accent);}
+.sc:nth-child(2)::before{background:var(--accent2);}
+.sc:nth-child(3)::before{background:var(--accent3);}
+.sc:nth-child(4)::before{background:#a78bfa;}
+.sc:hover{border-color:rgba(255,255,255,0.15);transform:translateY(-3px);}
+.sc:hover::before{opacity:1;}
+.sno{font-family:var(--font-head);font-size:2.5rem;font-weight:800;color:rgba(255,255,255,0.04);line-height:1;margin-bottom:0.8rem;}
+.sic{font-size:1.3rem;margin-bottom:0.8rem;}
+.sc h3{font-family:var(--font-head);font-size:0.95rem;font-weight:600;margin-bottom:0.4rem;}
+.sc p{font-size:0.82rem;color:var(--muted);line-height:1.6;}
+.feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.2rem;}
+.fc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;transition:all 0.3s;}
+.fc:hover{border-color:rgba(0,229,160,0.2);transform:translateY(-2px);}
+.fi{font-size:1.4rem;margin-bottom:0.8rem;}
+.fc h3{font-family:var(--font-head);font-size:0.95rem;font-weight:600;margin-bottom:0.4rem;}
+.fc p{font-size:0.82rem;color:var(--muted);line-height:1.6;}
+#register{padding:5rem 5%;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.ri{max-width:480px;margin:0 auto;text-align:center;}
+.rf{margin-top:1.8rem;display:flex;flex-direction:column;gap:0.9rem;}
+.inp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:0.85rem 1.1rem;color:var(--text);font-family:var(--font-body);font-size:0.93rem;outline:none;transition:border-color 0.2s;}
+.inp:focus{border-color:rgba(0,229,160,0.4);}
+.inp::placeholder{color:var(--muted);}
+.rbtn{background:var(--accent);color:#060910;border:none;border-radius:10px;padding:0.88rem;font-family:var(--font-body);font-size:0.95rem;font-weight:500;cursor:pointer;transition:all 0.2s;width:100%;}
+.rbtn:hover{box-shadow:0 6px 20px rgba(0,229,160,0.3);}
+.rbtn:disabled{opacity:0.6;cursor:not-allowed;}
+.msg{display:none;padding:0.8rem 1rem;border-radius:9px;font-size:0.83rem;text-align:left;}
+.msg.success{background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.25);color:var(--accent);}
+.msg.error{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#ef4444;}
+.msg.loading{background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);color:var(--accent2);}
+.divider{display:flex;align-items:center;gap:1rem;color:var(--muted);font-size:0.8rem;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.lredir{background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:0.85rem;font-family:var(--font-body);font-size:0.88rem;cursor:pointer;transition:all 0.2s;text-decoration:none;display:block;text-align:center;}
+.lredir:hover{border-color:rgba(255,255,255,0.2);}
+.snote{margin-top:1.2rem;font-size:0.78rem;color:var(--muted);}
+.snote a{color:var(--accent2);text-decoration:none;}
+footer{padding:2.5rem 5%;text-align:center;border-top:1px solid var(--border);color:var(--muted);font-size:0.82rem;}
+footer span{color:var(--accent);}
+.fi2{opacity:0;transform:translateY(24px);transition:opacity 0.6s ease,transform 0.6s ease;}
+.fi2.visible{opacity:1;transform:translateY(0);}
+@keyframes fd{from{opacity:0;transform:translateY(-20px);}to{opacity:1;transform:translateY(0);}}
+.particle{position:fixed;width:3px;height:3px;border-radius:50%;background:var(--accent);pointer-events:none;animation:pfloat linear infinite;}
+@keyframes pfloat{0%{transform:translateY(100vh);opacity:0;}10%{opacity:0.5;}90%{opacity:0.1;}100%{transform:translateY(-50px);opacity:0;}}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="index.html"><div class="logo-icon">🛡️</div>Mail<span>Guardian</span></a>
+  <ul>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="login.html" class="nav-login">Login</a></li>
+    <li><a href="admin-login.html" style="color:var(--muted);font-size:0.85rem;text-decoration:none;padding:0.45rem 0.8rem;border-radius:6px;border:1px solid rgba(245,158,11,0.3);color:var(--accent3);">🔐 Admin</a></li>
+    <li><a href="#register" class="nav-cta">Register Free</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="glow1"></div><div class="glow2"></div>
+  <div class="badge"><div class="bdot"></div>AI-Powered Email Intelligence</div>
+  <h1>Send emails with<br/><span class="hl">confidence & clarity</span></h1>
+  <p class="hsub">MailGuardian analyzes your tone before sending — detecting offensive phrases and suggesting professional rewrites in real time.</p>
+  <div class="hbtns">
+    <a href="#register" class="bp">Register Free</a>
+    <a href="#how" class="bs">See how it works →</a>
+  </div>
+  <div class="stats">
+    <div><div class="snum">0–100<span>%</span></div><div class="slbl">Sentiment Score</div></div>
+    <div style="border-left:1px solid var(--border);border-right:1px solid var(--border);padding:0 3rem;"><div class="snum">3<span>+</span></div><div class="slbl">Email Platforms</div></div>
+    <div><div class="snum">100<span>%</span></div><div class="slbl">Privacy First</div></div>
+  </div>
+</section>
+
+<section class="sec fi2">
+  <div class="stag">Scoring System</div>
+  <div class="stitle">Three tiers. Clear guidance.</div>
+  <p class="ssub">Every email gets a score from 0 to 100 based on tone, professionalism and receiver perception.</p>
+  <div class="tiers">
+    <div class="tc poor"><div style="font-size:1.5rem;margin-bottom:0.8rem;">⚠️</div><div class="tr poor">Score 0 – 50</div><div style="font-weight:600;font-size:0.9rem;margin-bottom:4px;">Poor</div><div class="td">Unprofessional or offensive tone detected. Strong rephrase suggested.</div></div>
+    <div class="tc fair"><div style="font-size:1.5rem;margin-bottom:0.8rem;">💡</div><div class="tr fair">Score 50 – 80</div><div style="font-weight:600;font-size:0.9rem;margin-bottom:4px;">Fair</div><div class="td">A few phrases flagged. Targeted suggestions provided.</div></div>
+    <div class="tc great"><div style="font-size:1.5rem;margin-bottom:0.8rem;">✅</div><div class="tr great">Score 80 – 100</div><div style="font-weight:600;font-size:0.9rem;margin-bottom:4px;">Great</div><div class="td">Professional tone. Minor tweaks only or ready to send.</div></div>
+  </div>
+</section>
+
+<section class="sec fi2" id="how">
+  <div class="stag">Process</div>
+  <div class="stitle">How MailGuardian works</div>
+  <p class="ssub">Simple, seamless and invisible — until you need it most.</p>
+  <div class="steps">
+    <div class="sc"><div class="sno">01</div><div class="sic">📝</div><h3>Register your email</h3><p>Sign up with your name and email. No password needed.</p></div>
+    <div class="sc"><div class="sno">02</div><div class="sic">🔌</div><h3>Download the extension</h3><p>Install the MailGuardian Chrome extension in one click.</p></div>
+    <div class="sc"><div class="sno">03</div><div class="sic">🤖</div><h3>AI analyzes your email</h3><p>Click Send — AI scans your message from the receiver's perspective.</p></div>
+    <div class="sc"><div class="sno">04</div><div class="sic">✨</div><h3>You decide what to send</h3><p>Accept suggestions, edit manually, or dismiss and send original.</p></div>
+  </div>
+</section>
+
+<section class="sec fi2" id="features">
+  <div class="stag">Features</div>
+  <div class="stitle">Everything you need to<br/>communicate better</div>
+  <p class="ssub">Built for professionals, students and anyone who values clear respectful communication.</p>
+  <div class="feats">
+    <div class="fc"><div class="fi">🧠</div><h3>Receiver's POV Analysis</h3><p>AI interprets your email through the eyes of the recipient — catching passive aggression and unintended offense.</p></div>
+    <div class="fc"><div class="fi">📊</div><h3>Real-time Sentiment Scoring</h3><p>A clear 0–100 score tells you exactly where your email stands — Poor, Fair or Great.</p></div>
+    <div class="fc"><div class="fi">🔁</div><h3>AI-Powered Rephrasing</h3><p>Get professionally rewritten alternatives for flagged phrases or your entire email.</p></div>
+    <div class="fc"><div class="fi">🌐</div><h3>Works Everywhere</h3><p>Seamlessly integrates with Gmail, Outlook, Yahoo Mail and all popular email platforms.</p></div>
+    <div class="fc"><div class="fi">🔒</div><h3>Privacy First</h3><p>Your email content is never stored. Only sentiment scores are logged.</p></div>
+    <div class="fc"><div class="fi">⚡</div><h3>Instant & Non-Intrusive</h3><p>Zero interference while you type. MailGuardian only activates when you click Send.</p></div>
+  </div>
+</section>
+
+<section id="register">
+  <div class="ri fi2">
+    <div class="stag" style="text-align:center;">Get Started</div>
+    <div class="stitle" style="text-align:center;font-size:1.8rem;">Register & get the extension</div>
+    <p style="color:var(--muted);font-size:0.88rem;margin-top:0.5rem;">Takes 10 seconds. Completely free.</p>
+    <div class="rf">
+      <input class="inp" type="text" id="regName" placeholder="Your full name"/>
+      <input class="inp" type="email" id="regEmail" placeholder="Your email address"/>
+      <button class="rbtn" id="regBtn">Register & Get Extension →</button>
+      <div class="msg" id="regMsg"></div>
+      <div class="divider">already registered?</div>
+      <a href="login.html" class="lredir">🔐 Login to view your dashboard</a>
+    </div>
+    <p class="snote">Need help? <a href="mailto:mailguardiansupport@gmail.com">mailguardiansupport@gmail.com</a></p>
+  </div>
+</section>
+
+<footer>
+  <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:0.8rem;font-family:var(--font-head);font-size:1.1rem;font-weight:800;">
+    <div class="logo-icon" style="width:26px;height:26px;font-size:12px;">🛡️</div>Mail<span>Guardian</span>
+  </div>
+  <p>© 2025 MailGuardian · <span>Privacy First</span> · <a href="admin-login.html" style="color:var(--muted);text-decoration:none;font-size:0.75rem;">Admin</a></p>
+</footer>
+
+<script>
+const SERVER = "https://homeliest-nola-dreamless.ngrok-free.dev";
+document.getElementById("regBtn").addEventListener("click",register);
+["regName","regEmail"].forEach(id=>document.getElementById(id).addEventListener("keydown",e=>{if(e.key==="Enter")register();}));
+async function register(){
+  const name=document.getElementById("regName").value.trim();
+  const email=document.getElementById("regEmail").value.trim();
+  const btn=document.getElementById("regBtn");
+  if(!name){showMsg("error","Please enter your full name.");return;}
+  if(!email||!email.includes("@")){showMsg("error","Please enter a valid email.");return;}
+  btn.disabled=true;btn.textContent="Registering...";
+  showMsg("loading","⏳ Registering your account...");
+  try{
+    const res=await fetch(SERVER+"/api/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,email})});
+    const data=await res.json();
+    if(data.success){showMsg("success","🎉 Welcome "+name+"! You're registered. Download the extension and enter your email to activate.");document.getElementById("regName").value="";document.getElementById("regEmail").value="";}
+    else showMsg("error",data.error||"Registration failed.");
+  }catch(e){showMsg("error","⚠️ Cannot connect to server. Make sure MailGuardian server is running.");}
+  btn.disabled=false;btn.textContent="Register & Get Extension →";
+}
+function showMsg(t,m){const el=document.getElementById("regMsg");el.className="msg "+t;el.textContent=m;el.style.display="block";}
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add("visible");}),{threshold:0.1});
+document.querySelectorAll(".fi2").forEach(el=>obs.observe(el));
+function mkParticle(){const p=document.createElement("div");p.className="particle";p.style.left=Math.random()*100+"vw";p.style.animationDuration=(10+Math.random()*15)+"s";p.style.animationDelay=Math.random()*3+"s";document.body.appendChild(p);setTimeout(()=>p.remove(),25000);}
+setInterval(mkParticle,1000);
+</script>
+</body>
+</html>

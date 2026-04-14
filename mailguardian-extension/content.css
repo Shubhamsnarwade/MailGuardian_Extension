@@ -1,0 +1,336 @@
+/* MailGuardian - Overlay Styles */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap');
+
+#mg-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#mg-overlay.mg-visible {
+  opacity: 1;
+}
+
+#mg-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 15, 25, 0.55);
+  backdrop-filter: blur(6px);
+}
+
+#mg-card {
+  position: relative;
+  z-index: 1;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 1.6rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.08);
+  transform: translateY(20px) scale(0.97);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-family: 'DM Sans', sans-serif;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+#mg-overlay.mg-visible #mg-card {
+  transform: translateY(0) scale(1);
+}
+
+/* HEADER */
+#mg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.4rem;
+}
+
+#mg-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+#mg-logo-icon {
+  font-size: 18px;
+}
+
+#mg-logo-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.3px;
+}
+
+#mg-logo-text strong {
+  color: #00b87a;
+}
+
+#mg-close-btn {
+  background: #f1f5f9;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 13px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  line-height: 1;
+}
+
+#mg-close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* LOADING */
+#mg-loading {
+  padding: 0.5rem 0 1rem;
+}
+
+#mg-progress-wrap {
+  background: #f1f5f9;
+  border-radius: 100px;
+  height: 6px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+#mg-progress-bar {
+  height: 100%;
+  width: 5%;
+  background: linear-gradient(90deg, #00b87a, #0ea5e9);
+  border-radius: 100px;
+  transition: width 0.5s ease;
+}
+
+#mg-status-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #0f172a;
+  margin-bottom: 4px;
+  transition: all 0.3s;
+}
+
+#mg-status-sub {
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+/* RESULT */
+#mg-score-row {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 1.2rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+#mg-score-circle {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+}
+
+#mg-score-num {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Syne', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+#mg-score-info {
+  flex: 1;
+}
+
+#mg-tier-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 100px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.mg-tier-great {
+  background: rgba(0,184,122,0.1);
+  color: #00875a;
+  border: 1px solid rgba(0,184,122,0.25);
+}
+
+.mg-tier-fair {
+  background: rgba(245,158,11,0.1);
+  color: #b45309;
+  border: 1px solid rgba(245,158,11,0.25);
+}
+
+.mg-tier-poor {
+  background: rgba(239,68,68,0.1);
+  color: #dc2626;
+  border: 1px solid rgba(239,68,68,0.25);
+}
+
+#mg-summary-text {
+  font-size: 0.83rem;
+  color: #475569;
+  line-height: 1.5;
+}
+
+/* SECTION LABEL */
+.mg-section-label {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 0.6rem;
+}
+
+/* FLAGGED */
+#mg-flagged-section {
+  margin-bottom: 1rem;
+}
+
+.mg-flag-item {
+  background: #fff8f0;
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: 10px;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 6px;
+}
+
+.mg-flag-phrase {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #92400e;
+  margin-bottom: 3px;
+}
+
+.mg-flag-reason {
+  font-size: 0.78rem;
+  color: #78716c;
+  margin-bottom: 3px;
+}
+
+.mg-flag-suggestion {
+  font-size: 0.78rem;
+  color: #00875a;
+  font-weight: 500;
+}
+
+/* REPHRASE */
+#mg-rephrase-section {
+  margin-bottom: 1.2rem;
+}
+
+#mg-rephrase-text {
+  background: #f0fdf4;
+  border: 1px solid rgba(0,184,122,0.2);
+  border-radius: 10px;
+  padding: 0.8rem;
+  font-size: 0.82rem;
+  color: #1e3a2e;
+  line-height: 1.6;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+/* ACTIONS */
+#mg-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+#mg-accept-btn {
+  flex: 1;
+  background: #00b87a;
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  padding: 0.65rem 1rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+#mg-accept-btn:hover { background: #00a36c; }
+
+#mg-edit-btn {
+  flex: 1;
+  background: #f8fafc;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  padding: 0.65rem 1rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+#mg-edit-btn:hover { background: #f1f5f9; }
+
+#mg-dismiss-btn {
+  width: 100%;
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  padding: 0.5rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  margin-top: 2px;
+}
+
+#mg-dismiss-btn:hover { color: #64748b; }
+
+/* ERROR */
+#mg-error {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+#mg-error-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+
+#mg-error-msg {
+  font-size: 0.85rem;
+  color: #ef4444;
+  margin-bottom: 1rem;
+}
+
+#mg-retry-btn {
+  background: #0f172a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 1.4rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
